@@ -1,0 +1,52 @@
+
+# save version
+
+python.Execute "import max.save as save"
+python.Execute "reload(save)"
+python.Execute "save.version()"
+
+# export obj
+
+python.Execute "import max.obj_export as obj"
+python.Execute "reload(obj)"
+python.Execute "obj.export()"
+
+
+
+# create asset
+
+
+fn cr_asset nam type  =
+(
+	python.Execute "import max.create as create"
+	python.Execute "reload(create)"
+	pythoncmd = "create.asset('"+nam+"','"+type+"')"
+	python.Execute pythoncmd
+)
+
+global myfirstvariable
+global my2ndvariable
+
+try(destroyDialog asset_creator)catch()
+
+rollout asset_creator "Create Asset" width:162 height:300
+(
+	editText 'edt3' "" pos:[9,51] width:142 height:27 align:#left
+	editText 'edt4' "" pos:[11,95] width:142 height:27 align:#left
+	button 'btn1' "proceed" pos:[19,175] width:128 height:41 align:#left
+		
+	on btn1 pressed do
+	(
+		myfirstvariable = edt3.text
+		my2ndvariable = edt4.text
+		print myfirstvariable
+		print my2ndvariable
+		cr_asset myfirstvariable my2ndvariable
+	)
+		
+		
+		
+		
+	)
+
+createdialog asset_creator "ok"

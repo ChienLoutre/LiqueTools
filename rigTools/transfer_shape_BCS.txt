@@ -1,0 +1,15 @@
+Transferer un rig BCS d'une mode a une autre avec la meme topologie.
+
+1. Selectionner la Shape de la mode a transferer
+
+2. Selectionner le Tweak de la mode qui recoit la nouvelle Shape
+
+3. Mettre Freeze Input dans le BCS a 0. Mettre le Tweak et le BCS a 0.
+
+4. Aller dans le connection editor et mettre a gauche la shape a transferer, a droite le tweak.
+
+5. Connecter OutMesh vers input|input[0]|input[0].inputGeometry.
+
+5bis. Laisser Tweak a 0, BCs a activer
+
+6. Comment deconnecter cette daube ?

@@ -1,0 +1,75 @@
+global proc Snap (){
+if (`window -ex snapWin`) deleteUI snapWin;
+window -t "Snap" snapWin;
+columnLayout -adj 1;
+rowColumnLayout -nc 4 -cw 1 75 -cw 2 50 -cw 3 50 -cw 4 50;
+checkBox -l "Translate" -v 1 snp_t;
+
+checkBox -l "X" -v 1 snp_tx;
+checkBox -l "Y" -v 1 snp_ty;
+checkBox -l "Z" -v 1 snp_tz;
+checkBox -l "Rotate" -v 1 snp_r;
+
+checkBox -l "X" -v 1 snp_rx;
+checkBox -l "Y" -v 1 snp_ry;
+checkBox -l "Z" -v 1 snp_rz;
+checkBox -l "Scale" -v 1 snp_s;
+
+checkBox -l "X" -v 1 snp_sx;
+checkBox -l "Y" -v 1 snp_sy;
+checkBox -l "Z" -v 1 snp_sz;
+
+setParent..;
+button -l "Snap it" -c"doSnap";
+window -e -wh 215 100 snapWin;
+showWindow snapWin;
+}
+
+global proc doSnap (){
+int $tx,$ty,$tz,$rx,$ry,$rz,$sx,$sy,$sz,$t,$r,$s;
+float $fps[],$pos[],$tps[],$rps[],$sps[];
+string $snp[] = `ls -sl`;
+$sps[0]=`getAttr ($snp[0]+".sx")`;
+$sps[1]=`getAttr ($snp[0]+".sy")`;
+$sps[2]=`getAttr ($snp[0]+".sz")`;
+$tps= `xform -q -ws -t $snp[1]`;
+$rps= `xform -q -ws -ro $snp[1]`;
+float $rpA[] = `xform -q -rp $snp[1]`;
+float $rpB[] = `xform -q -rp $snp[0]`;
+$tx=`checkBox -q -v snp_tx`;
+$ty=`checkBox -q -v snp_ty`;
+$tz=`checkBox -q -v snp_tz`;
+
+$rx=`checkBox -q -v snp_rx`;
+$ry=`checkBox -q -v snp_ry`;
+$rz=`checkBox -q -v snp_rz`;
+
+$sx=`checkBox -q -v snp_sx`;
+$sy=`checkBox -q -v snp_sy`;
+$sz=`checkBox -q -v snp_sz`;
+
+$t=`checkBox -q -v snp_t`;
+$r=`checkBox -q -v snp_r`;
+$s=`checkBox -q -v snp_s`;
+if ($t){
+if ($tx) $fps[0]=($tps[0] + $rpA[0] - $rpB[0] );
+if ($ty) $fps[1]=($tps[1] + $rpA[1] - $rpB[1] );
+if ($tz) $fps[2]=($tps[2] + $rpA[2] - $rpB[2] );
+xform -ws -t $fps[0] $fps[1] $fps[2] $snp[0];
+}
+if ($r){
+if ($rx) $fps[0]=($rps[0] + $rpA[0] - $rpB[0] );
+if ($ry) $fps[1]=($rps[1] + $rpA[1] - $rpB[1] );
+if ($rz) $fps[2]=($rps[2] + $rpA[2] - $rpB[2] );
+xform -ws -ro $fps[0] $fps[1] $fps[2] $snp[0];
+}
+if ($s){
+if ($sx) $sps[0]=`getAttr ($snp[1]+".sx")`;
+if ($sy) $sps[1]=`getAttr ($snp[1]+".sy")`;
+if ($sz) $sps[2]=`getAttr ($snp[1]+".sz")`;
+setAttr ($snp[0]+".sx") $sps[0];
+setAttr ($snp[0]+".sy") $sps[1];
+setAttr ($snp[0]+".sz") $sps[2];
+}
+}
+Snap;

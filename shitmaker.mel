@@ -1,0 +1,430 @@
+//INFO
+// Put the script in your script maya Pref Script folder and use this command to start it:
+//         source "shitmaker.mel"; shitmaker;
+
+
+//global string $floatFieldNameSize="";
+//global string $floatFieldName="";
+
+global proc shitmaker(){
+
+
+string $window = `window -title "SHITMAKER TOOLKIT 3D v1.0"
+       -iconName "SHITMAKER 3D v1.0"
+       -widthHeight 200 55
+       -backgroundColor .1 .1 .1
+       -toolbox 1`;
+       
+columnLayout -adjustableColumn true;
+       //iconTextButton -style "iconOnly" -image1 "spotlight.png" -label "spotlight";
+       
+            // REPLACE IMAGE       
+            //iconTextButton -align "left" -style "iconOnly" -image1 "RenderHeads1.xpm" -highlightImage "RenderHeads2.xpm" -label "RenderHeads" -command ("showHelp -absolute \"http://www.renderheads.com/\"");
+			//text -align "left" -label (RH_uiRes("m_RH_VCP.kCredits_SoftwareDevelopment"));       
+       
+       
+
+        text   -label "_.-^^---....,,--" -align "center";
+        text   -label "_--                                  --_" -align "center";
+        text   -label "<                                        >)" -align "center";
+        text   -label "|     SHITMAKER TOOLKIT    |" -align "center";
+        text   -label "\._                                   _./" -align "center";
+        text   -label "```--. . ,         ; .--'''" -align "center";
+        text   -label "|         |   |" -align "center";
+        text   -label " .-=| |       | |=-." -align "center";
+        text   -label "" -align "center";
+        text   -label "`-=-=-=-=-=-'" -align "center";
+        text   -label "|| ; ||" -align "center";
+        text   -label " _____.,\=||==-=||=/~,._____" -align "center";
+
+        
+
+         setParent ..;
+     
+//string $form = `formLayout`;
+//string $tabs = `tabLayout -innerMarginWidth 5 -innerMarginHeight 5 -bgc 0 0 0`;
+
+
+       
+//formLayout -edit
+//   -attachForm $tabs "top"    2
+//     -attachForm $tabs "left"   2
+//     -attachForm $tabs "bottom" 2
+//     -attachForm $tabs "right"  2
+//     $form;
+
+     string $child1 = `columnLayout -adjustableColumn true`;
+            
+             separator -height 10 -style "single";
+             //floatFieldGrp -numberOfFields 1 -width 100 -label "'_'" -value1 1337 -precision 0;
+             
+             rowLayout -numberOfColumns 2 -width 200;
+             //$floatFieldNameSize = `floatField -width 98 -value 1 -minValue -10 -maxValue 10 -precision 2 `;
+             //$floatFieldName = `floatField -width 98 -value 1337 -precision 0`;
+             
+             floatField -width 98 -value 1 -minValue 0 -maxValue 10 -precision 2 floatFieldNameSize;
+             floatField -width 98 -value 55555 -precision 0 floatFieldName;
+              setParent ..;   
+                       
+             button -bgc 0 1 1 /*-width 200 -height 200 */ -label "DELETE RANDOM FACES" -command del_rand_faces;
+             button -bgc 0 1 1 /*-width 200 -height 200 */ -label "MOVE RANDOM VERTEX" -command rand_vertex;
+             button -bgc 0 1 1 /*-width 200 -height 200 */ -label "RANDOM FACE NORMALS" -command rand_normals;
+             button -bgc 1 0 0 /*-width 200 -height 200 */ -label "KILL YOURSELF" -command freeze_maya;
+             separator -height 20 -style "single";
+             button  -bgc 0 1 1 -label "ADD COCK" -command add_dick;
+             setParent ..;
+
+     //string $child2 = `rowColumnLayout -numberOfColumns 2`;
+       //  button; button; button;
+        // setParent ..;
+         
+    //string $child3 = `rowColumnLayout -numberOfColumns 2`;
+         //button; button; button;
+        // setParent ..;
+
+   //  tabLayout -edit
+  //      -tabLabel $child1 "MESH" /*   -tabLabel $child2 "ROVLETTE"   */ /*   -tabLabel $child3 "GO!"    */ $tabs;
+
+ showWindow;
+
+// Resize the main window
+
+window -edit -widthHeight 210 350 $window;
+
+PolygonSelectionConstraints;
+changeSelectMode -component;
+resetPolySelectConstraint; 
+deleteUI polySelectionConstraintPanel1Window;
+changeSelectMode -object;
+
+
+}
+
+
+
+
+
+
+//-----------------------COMMANDS----------------------------------
+
+global proc rand_normals(){
+//global string $floatFieldNameSize;
+
+
+float $value = `floatField -query -value floatFieldNameSize`;
+
+print $value;
+
+string $mySel[] = `ls -sl`;
+string $shapes[] = `listRelatives $mySel`;
+for ($m in $shapes){
+    setAttr ($m+".doubleSided") 0;
+}
+
+
+SelectFacetMask;
+
+
+polySelectConstraint -m 3;
+polySelectConstraint -r true;
+$y = rand(0,0.2) * $value;
+polySelectConstraint -rr $y;
+
+
+
+string $faces[] = `ls -sl`;
+for ($t in $faces){
+polyNormal -normalMode 0 -userNormalMode 1 -ch 1 $t;
+}
+
+
+changeSelectMode -object;
+resetPolySelectConstraint; 
+
+}  
+
+//----------------------------------------------------------------
+
+
+global proc del_rand_faces(){
+
+//global string $floatFieldNameSize;
+
+float $value = `floatField -query -value floatFieldNameSize`;
+
+string $mySel[] = `ls -sl`;
+
+
+  string $faces[] = {};
+  float $selectPercent = 0.1 * $value;
+//  if ($selectPercent > 1){
+  
+  for($each in `ls -sl`)
+  {
+  	int $nFaces[] = `polyEvaluate -f $each`;
+  	int $sFaces = $nFaces[0] * $selectPercent;
+  	for($i=0;$i<$sFaces;$i++)
+  	{
+  		string $rFace = $each + ".f[" + int(`rand 0 $nFaces[0]`) + "]";
+  		while(stringArrayContains($rFace, $faces) == 1)
+  		{
+  			$rFace = $each + ".f[" + int(`rand 0 $nFaces[0]`) + "]";
+  		}
+  		$faces[size($faces)] = $rFace;
+  	}
+  }
+  select -r $faces;
+doDelete;
+
+for ($c in $mySel){
+select -add $c;
+} 
+
+//}
+
+changeSelectMode -object;
+
+ 
+
+}
+
+//----------------------------------------------------------------
+
+global proc freeze_maya(){
+
+
+
+polySphere -n FREEZE -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;
+
+
+ string $faces[] = {};
+  float $selectPercent = 100;
+  for($each in `ls -sl`)
+  {
+  	int $nFaces[] = `polyEvaluate -f $each`;
+  	int $sFaces = $nFaces[0] * $selectPercent;
+  	for($i=0;$i<$sFaces;$i++)
+  	{
+  		string $rFace = $each + ".f[" + int(`rand 0 $nFaces[0]`) + "]";
+  		while(stringArrayContains($rFace, $faces) == 1)
+  		{
+  			$rFace = $each + ".f[" + int(`rand 0 $nFaces[0]`) + "]";
+  		}
+  		$faces[size($faces)] = $rFace;
+  	}
+  }
+  select -r $faces;
+
+
+doDelete;
+
+changeSelectMode -object;
+ 
+
+}
+
+//----------------------------------------------------------------
+
+global proc rand_vertex(){
+
+global string $floatFieldName;
+
+float $value = `floatField -query -value floatFieldName`;
+
+float $value2 = `floatField -query -value floatFieldNameSize`;
+
+SelectVertexMask;
+
+polySelectConstraint -m 3;
+polySelectConstraint -r true;
+$y = rand(0,0.5) * $value2 ;
+polySelectConstraint -rr $y;
+
+//if (`popupMenu -exists tempMM`) { deleteUI tempMM; }if (`popupMenu -exists tempMM2`) { deleteUI tempMM2; };   
+
+
+$x = rand(1,1000) * $value;
+rotate $x $x $x;
+
+
+changeSelectMode -object;
+
+resetPolySelectConstraint; 
+}
+
+//----------------------------------------------------------------
+
+global proc add_dick(){
+polyCylinder -n DICK -r 1 -h 4 -sx 6 -sy 5 -sz 2 -ax 0 1 0 -rcp 1 -cuv 3 -ch 1;
+
+// DICK polyCylinder1 //
+
+select -r DICK.vtx[0:49] ;
+
+move -r 0 2.83199 0 ;
+
+select -r DICK.vtx[30:35] ;
+
+scale -r -p 0cm 4.03199cm -2.98023e-008cm 0.794446 0.794446 0.794446 ;
+
+move -r 0 0.475865 0 ;
+
+// Undo: move -r 0 0.475865 0
+
+// Undo: scale -r -p 0cm 4.03199cm -2.98023e-008cm 0.794446 0.794446 0.794446
+
+scale -r -p 0cm 4.031991cm -2.98023e-008cm 0.880093 0.880093 0.880093 ;
+
+move -r 0 0.509855 0 ;
+
+select -r DICK.vtx[24:29] ;
+
+move -r 0 0.376778 0 ;
+
+scale -r -p 0cm 3.608769cm -2.98023e-008cm 1 1 1 ;
+
+select -r DICK.vtx[18:23] ;
+
+move -r 0 -0.365276 0 ;
+
+scale -r -p 0cm 2.066716cm -2.98023e-008cm 1.017256 1.017256 1.017256 ;
+
+select -r DICK.vtx[12:17] ;
+
+move -r 0 -0.12554 0 ;
+
+select -r DICK.f[3] ;
+
+move -r 0 0.0107668 0 ;
+
+// Undo: move -r 0 0.0107668 0
+
+select -tgl DICK.f[9] ;
+
+// Undo: select -tgl DICK.f[9]
+
+// Undo: select -r DICK.f[3]
+
+// Undo: doMenuComponentSelection("DICK", "facet")
+
+select -r DICK.vtx[6:7] DICK.vtx[9:10] ;
+
+scale -r -p 5.96046e-008cm 0.83199cm -2.98023e-008cm 1.219627 1 1 ;
+
+scale -r -p 5.96046e-008cm 0.83199cm -2.98023e-008cm 1.052487 1 1 ;
+
+select -r DICK.f[0] DICK.f[3] DICK.f[6] DICK.f[9] ;
+
+hilite DICK.f[0] DICK.f[3] DICK.f[6] DICK.f[9] ;
+
+selectMode -component ;
+
+select -r DICK.f[0] DICK.f[3] DICK.f[6] DICK.f[9] ;
+
+polyExtrudeFacet -constructionHistory 1 -keepFacesTogether 1 -pvx 5.960464478e-008 -pvy 0.8156664371 -pvz -2.980232239e-008 -divisions 1 -twist 0 -taper 1 -off 0 -smoothingAngle 30 DICK.f[0] DICK.f[3] DICK.f[6] DICK.f[9];
+
+// polyExtrudeFace5 //
+
+setAttr "polyExtrudeFace1.localTranslate" -type double3 0 0 0.714324 ;
+
+select -r DICK.f[0] DICK.f[3] DICK.f[6] DICK.f[9] ;
+
+polyExtrudeFacet -constructionHistory 1 -keepFacesTogether 1 -pvx 8.940696716e-008 -pvy 0.695069842 -pvz -5.960464478e-008 -divisions 1 -twist 0 -taper 1 -off 0 -smoothingAngle 30 DICK.f[0] DICK.f[3] DICK.f[6] DICK.f[9];
+
+// polyExtrudeFace6 //
+
+setAttr "polyExtrudeFace2.localTranslate" -type double3 0 0 0.670708 ;
+
+setAttr "polyExtrudeFace2.localScale" -type double3 1 0.232958 1 ;
+
+setAttr "polyExtrudeFace2.localScale" -type double3 0.735073 0.232958 1 ;
+
+setAttr "polyExtrudeFace2.localScale" -type double3 0.735073 0.0742799 1 ;
+
+setAttr "polyExtrudeFace2.localTranslate" -type double3 0 0 0.586557 ;
+
+select -r DICK.vtx[6:7] DICK.vtx[9:10] DICK.vtx[52:53] DICK.vtx[58:59] DICK.vtx[64:67] DICK.vtx[70:71] ;
+
+// Undo: select -r DICK.vtx[6:7] DICK.vtx[9:10] DICK.vtx[52:53] DICK.vtx[58:59] DICK.vtx[64:67] DICK.vtx[70:71]
+
+select -r DICK.vtx[6:7] DICK.vtx[9:10] DICK.vtx[52:53] DICK.vtx[58:59] DICK.vtx[64:65] DICK.vtx[70:73] ;
+
+// Undo: select -r DICK.vtx[6:7] DICK.vtx[9:10] DICK.vtx[52:53] DICK.vtx[58:59] DICK.vtx[64:65] DICK.vtx[70:73]
+
+select -r DICK.vtx[6:7] DICK.vtx[9:10] DICK.vtx[52:53] DICK.vtx[58:59] DICK.vtx[64:65] DICK.vtx[70:71] ;
+
+scale -r -p 8.9407e-008cm 0.725602cm 0cm 1.288486 1 1 ;
+
+select -d DICK.vtx[6:7] DICK.vtx[9:10] DICK.vtx[52:53] DICK.vtx[58:59] DICK.vtx[64:65] DICK.vtx[70:71] ;
+
+hilite -u DICK ;
+
+select -r DICK ;
+
+polyColorPerVertex -r 0.8039 -g 0.7216 -b 0.6471 -a 1 -cdo;
+
+select -r DICK.vtx[24:47] DICK.vtx[49] ;
+
+polyColorPerVertex -r 0.8627 -g 0.7725 -b 0.6941 -a 1 -cdo;
+
+select -r DICK.vtx[36:47] DICK.vtx[49] ;
+
+polyColorPerVertex -r 0.6667 -g 0.3922 -b 0.4784 -a 1 -cdo;
+
+hilite DICK.vtx[36:47] DICK.vtx[49] ;
+
+select -d DICK.vtx[36:47] DICK.vtx[49] ;
+
+hilite -u DICK ;
+
+select -r DICK ;
+
+select -cl ;
+
+select -r DICK ;
+
+select -r DICK.vtx[24:47] DICK.vtx[49] ;
+
+move -r 0 0.706492 0 ;
+
+select -r DICK.vtx[30:47] DICK.vtx[49] ;
+
+move -r 0 0.647384 0 ;
+
+select -r DICK.vtx[24:29] ;
+
+move -r 0 -0.288584 0 ;
+
+scale -r -p 0cm 4.026677cm -2.98023e-008cm 1.158348 1.158348 1.158348 ;
+
+scale -r -p 0cm 4.026677cm 0cm 0.916302 0.916302 0.916302 ;
+
+select -r DICK.vtx[42:47] DICK.vtx[49] ;
+
+move -r 0 0.374539 0 ;
+
+move -r 0 -0.152194 0 ;
+
+hilite DICK.vtx[.42:47] DICK.vtx[49] ;
+
+select -d DICK.vtx[42:47] DICK.vtx[49] ;
+
+select -r DICK.vtx[30:35] ;
+
+move -r 0 -0.400285 0 ;
+
+scale -r -p 0cm 5.914242cm 0cm 1.230966 1.230966 1.230966 ;
+
+move -r 0 0.0909534 0 ;
+
+hilite -u DICK ;
+
+select -r DICK ;
+
+changeSelectMode -object;
+
+rename "DICK" "dick0001";
+
+DeleteHistory;
+
+}

@@ -1,0 +1,1 @@
+C:\Python27\python.exe Y:\Liquefacteur\utils\scripts\message_du_jour.py

@@ -1,0 +1,4 @@
+https://www.quora.com/How-do-I-execute-Maya-script-without-lauching-Maya
+
+
+http://stackoverflow.com/questions/27437733/use-external-python-script-to-open-maya-and-run-another-script-inside-maya

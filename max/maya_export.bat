@@ -1,0 +1,1 @@
+C:\Python27\python.exe Y:\Liquefacteur\utils\scripts\max\run_mayapy.py
