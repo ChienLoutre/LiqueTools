@@ -1,38 +1,69 @@
 import time
-import maya.cmds as mc
 import os
 import sys
 from variables import *
 import padding_numbers
 import utils.get_extension as ext
-import utils.create as create
+
+
 reload(ext)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 #		   Save Version File
-#
-#		MODIFICATIONS !!!
-#
+# Works in Maya and Guerilla Render
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
+def app_chk():
 
+	open_app = None
+
+	try:
+		import maya.cmds as mc
+		open_app = 'maya'
+		print('Working on MAYA')
+	except:
+		from guerilla import Document
+		doc = Document()
+		open_app = 'grender'
+
+	return open_app
 
 def version():
+	'''
+	Creates a version of the file you are working on.
+	You MUST be in your Project to use this function.
 
-	filename = mc.file(q=True, sn=True)
+	syntax :
 
-	charvalue = filename.split('/')
+	version()
+	'''
+	open_app = app_chk()
+
+	if open_app == 'maya':
+		import maya.cmds as mc
+		filename = mc.file(q=True, sn=True)
+	elif open_app == 'grender':
+		from guerilla import Document
+		doc = Document()
+		filename = doc.getfilename()
+	elif open_app == None:
+		raise SystemError('You are not in an Application supported by this script')
+
+	charvalue = str(filename).split('/')
 
 	# Verifier que l'on est dans le projet
 
 	if not project_name in charvalue:
 
-		sys.exit('You are not working in the Project !!')
+		sys.exit('You are not working in the Project !')
 
 
 	# fait un thumbnail
 
-	create.thumbnail()
+	if open_app == 'maya':
+
+		import utils.create as create
+		create.thumbnail()
 
 	# Sortir l'emplacement du dossier de version seulement
 
@@ -40,17 +71,16 @@ def version():
 	filepath = '/'.join(file_path)
 	path_versions = os.listdir(filepath)
 
+	# verifier si dossier "wip" dans la version.
+
+	if 'wip' in path_versions:
+		path_versions.remove('wip')
+
 	file_path = '/'.join(charvalue)
-
-
 	filevalue = path_versions[-1]
-
 	indexing = filevalue.split('V')
 	indexing = int(indexing[-1])
-
 	indexing += 1
-
-
 	indexing = padding_numbers.padder(indexing, pad)
 
 
@@ -63,20 +93,21 @@ def version():
 	charvalue.pop(-1)
 	charvalue.append(filevalue)
 	charvalue = '/'.join(charvalue)
-
 	os.mkdir(charvalue)
 
 	charvalue = charvalue + '/' + file_type
-
 	new_name = charvalue + '.' + extension
 
+	if open_app == 'maya':
 
-	mc.file(rename = new_name)
-	mc.file(save = True, type = 'mayaAscii')
+		mc.file(rename = new_name)
+		mc.file(save = True, type = 'mayaAscii')
+		mc.warning('version number ' + str(indexing) + ' created !')
+	elif open_app == 'grender':
 
+		doc.save(filename = new_name, warn=True, addtorecent=False)
 
 	print('version number ' + str(indexing) + ' created !')
-	mc.warning('version number ' + str(indexing) + ' created !')
 
 	return new_name
 
@@ -86,9 +117,16 @@ def version():
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 def master(comments = '', merge_refs=False, bin_or_ascii='mayaBinary', ask_version=True):
+	'''
+	Creates a MASTER for your file, that you can reference in your other scenes.
+	
+	If you need to break references (in case of a Rig Master, for example), do not forget
+	to check <merge_refs=True>. Otherwise this is NOT recommended.
 
-	print('Master save STARTED')
+	syntax:
 
+	master(comments = '', merge_refs=False, bin_or_ascii='mayaBinary', ask_version=True)
+	'''
 	filename = mc.file(q=True, sn=True)
 
 	charvalue = filename.split('/')
